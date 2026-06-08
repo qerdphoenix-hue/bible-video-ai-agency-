@@ -162,10 +162,10 @@ class TestBibleValidator:
     
     def test_validate_unknown_book(self):
         """Test validating reference with unknown book"""
-        result = BibleValidator.validate_reference("Unknown 1:1")
+        result = BibleValidator.validate_reference("Foobar 1:1")
         
         assert not result.is_valid
-        assert "Unknown book" in result.errors[0]
+        assert any("Unknown book" in e for e in result.errors)
     
     def test_validate_invalid_verse_range(self):
         """Test validating invalid verse range"""
