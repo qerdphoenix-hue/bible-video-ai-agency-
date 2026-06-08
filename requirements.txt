@@ -1,5 +1,5 @@
 # Core Dependencies
-Python>=3.9
+# (Python 3.9+ is required - check your Python version with: python --version)
 
 # Web Framework
 fastapi==0.104.1
