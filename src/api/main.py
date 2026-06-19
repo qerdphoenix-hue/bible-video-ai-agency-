@@ -6,6 +6,8 @@ from contextlib import asynccontextmanager
 
 from src.utils.config import settings
 from src.utils.logger import get_logger
+from src.api.routes import router
+from src.database import init_db
 
 logger = get_logger(__name__)
 
@@ -15,6 +17,8 @@ async def lifespan(app: FastAPI):
     """Application lifespan events"""
     # Startup
     logger.info(f"Starting {settings.app_name} v{settings.app_version}")
+    init_db()
+    logger.info("Database initialized")
     yield
     # Shutdown
     logger.info(f"Shutting down {settings.app_name}")
@@ -37,6 +41,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include API routes
+app.include_router(router)
+
 
 @app.get("/")
 async def root():
@@ -44,7 +51,8 @@ async def root():
     return {
         "name": settings.app_name,
         "version": settings.app_version,
-        "status": "operational"
+        "status": "operational",
+        "docs": "/docs",
     }
 
 
@@ -53,29 +61,5 @@ async def health():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "version": settings.app_version
+        "version": settings.app_version,
     }
-
-
-@app.get("/api/v1")
-async def api_info():
-    """API information"""
-    return {
-        "api_version": "v1",
-        "endpoints": {
-            "videos": "/api/v1/videos",
-            "social_media": "/api/v1/social-media",
-            "analytics": "/api/v1/analytics",
-            "health": "/health"
-        }
-    }
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        log_level="info"
-    )
